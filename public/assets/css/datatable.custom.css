@@ -1,0 +1,17 @@
+button.tab-button{
+    border: 1px solid transparent !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-top-left-radius: 0.375rem !important;
+    border-top-right-radius: 0.375rem !important;
+    background-color: #fff !important;
+    transition: 1s ease !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+}
+
+button.tab-button.active{
+    background-color: #0071bd !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
