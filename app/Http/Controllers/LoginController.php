@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserStatus;
 use Illuminate\Http\Request;
 use App\Services\ProfileService;
 use Illuminate\Support\Facades\DB;
@@ -35,20 +36,22 @@ class LoginController extends Controller
             return response()->json(['success' => false, 'message' => 'Incorrect password.'], 401);
         }
 
+        $userStatusId = $user->userstatus_id;
+        $userStatusName = UserStatus::where('id', $userStatusId)->value('name');
+
         // Handle user status
-        switch ($user->userstatus_id) {
-            case 1: // Active account
+        switch ($userStatusName) {
+            case 'Active': // Active account
                 Auth::login($user);
 
                 // Regenerate session ID
                 session()->regenerate();
 
-                // Store session data
                 session([
                     'profile_id' => $user->profile->id,
-                    'usertype_id' => $user->userType->user_level_id,
+                    'usertype_id' => $user->usertype_id,
+                    'authority_level' => $user->userType->stationType->authority_level,
                     'station_id' => $user->station_id,
-                    'shortcode' => $user->userType->shortcode,
                     'logged_in' => true,
                 ]);
 
@@ -58,13 +61,13 @@ class LoginController extends Controller
                     'redirect_url' => url('/pages/dashboard'),
                 ]);
 
-            case 0: // Inactive account
+            case 'Pending': // Inactive account
                 return response()->json(['success' => false, 'message' => 'Your account is not yet activated.'], 403);
 
-            case 2: // Deactivated account
+            case 'Deactivated': // Deactivated account
                 return response()->json(['success' => false, 'message' => 'Your account has been deactivated.'], 403);
 
-            default:
+            default: // Unknown account status
                 return response()->json(['success' => false, 'message' => 'Unknown account status.'], 400);
         }
     }
@@ -110,15 +113,15 @@ class LoginController extends Controller
         }
     
         $profile_id = session('profile_id');
-        $level = session('usertype_id');
-    
+        $level = session('authority_level');
+
         // Fetch user details
         $user_details = $this->fetchUserDetails($profile_id, $level);
-    
+
         if (empty($user_details)) {
             return redirect()->route('login')->withErrors(['message' => 'User details could not be found.']);
         }
-    
+
         // Map contact details
         $contactValues = collect($user_details)->map(function ($userDetail) {
             return [
@@ -128,10 +131,10 @@ class LoginController extends Controller
                 'contact_type_name' => $userDetail['contact_type_name'],
             ];
         })->toArray();
-    
+
         // Get the station name based on user level
         $stationName = $this->getStation($level);
-    
+
         // Create ProfileService instance
         $profileService = new ProfileService(
             $profile_id,
@@ -144,12 +147,14 @@ class LoginController extends Controller
             $user_details[0][$stationName] ?? '',
             $contactValues
         );
-    
+        
         // Fetch chart data
         $chartDataController = new ChartDataController();
         $printChartData = $chartDataController->getPrintChartData(); // This will return data from the ChartDataController
         $nonPrintChartData = $chartDataController->getNonPrintChartData(); // Data for non-print charts
-    
+        $totalLr = $chartDataController->getTotalLr();
+        $totalLearners = $chartDataController->getTotalLearners();
+
         // Pass both profile data and chart data to the view
         return view('pages.dashboard', [
             'profileService' => $profileService,
@@ -163,8 +168,14 @@ class LoginController extends Controller
             'sliVsPopData_np' => $nonPrintChartData['sliVsPopData_np'],
             'exdefData_np' => $nonPrintChartData['exdefData_np'],
             'heatmapData_np' => $nonPrintChartData['heatmapData_np'],
+            'printCount' => $totalLr['printCount'],
+            'nonPrintCount' => $totalLr['nonPrintCount'],
+            'gradeCount' => $totalLearners['gradeCount'],
+            'totalPopulation' => $totalLearners['totalPopulation'],
         ]);
-    }    
+    }
+        
+
     public function fetchUserDetails($profile_id, $level)
     {
         try {

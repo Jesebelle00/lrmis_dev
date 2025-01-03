@@ -1,37 +1,25 @@
 <div id="totalLearnersChart" style="width: 100%; height: 200px;"></div>
 
 <script type="text/javascript">
-    // Dummy data for demonstration purposes (total learners)
-    var totalLearnersData = [
-        { grade_level: 'Grade 1', qty: 10 },
-        { grade_level: 'Grade 2', qty: 15 },
-        { grade_level: 'Grade 3', qty: 20 },
-        { grade_level: 'Grade 4', qty: 25 },
-        { grade_level: 'Grade 5', qty: 30 },
-        { grade_level: 'Grade 6', qty: 35 }
-    ];
+    // Get the data passed from the controller
+    var totalLearnersData = @json($gradeCount);
 
     // Initialize the chart for total learners version
     var chartDomLearners = document.getElementById('totalLearnersChart');
     var totalLearnersChart = echarts.init(chartDomLearners);
 
-    var gradeLevels = [...new Set(totalLearnersData.map(item => item.grade_level))];
-
-    // Prepare series data for total learners version
+    // Prepare the grade levels and series data
+    var gradeLevels = totalLearnersData.map(item => item.grade_level);
     var seriesLearners = [{
-        name: 'Learning Resources',
+        name: 'Total Learners',
         type: 'bar',
-        data: gradeLevels.map(grade => {
-            var totalQty = totalLearnersData
-                .filter(d => d.grade_level === grade)
-                .reduce((sum, item) => sum + item.qty, 0);
-            return totalQty;
-        })
+        data: totalLearnersData.map(item => item.total_population)
     }];
 
     // Chart options for total learners version
     var optionLearners = {
-        legend: {            itemGap: 15, // Add spacing between legend items
+        legend: {
+            itemGap: 15, // Add spacing between legend items
         },
         tooltip: {
             trigger: 'axis',
@@ -44,7 +32,6 @@
         },
         yAxis: {
             type: 'value',
-            name: 'Population'
         },
         series: seriesLearners,
         grid: {

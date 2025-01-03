@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class AddResourceController extends Controller
 {
@@ -233,11 +234,12 @@ class AddResourceController extends Controller
     {
         // $validated = $request->validate([
         //     'search' => 'required|string|max:255',
-        //     'selected-id' => 'nullable|integer',
+        //     'selectedID' => 'nullable|integer',
         //     'print_type' => 'required|string|max:50',
         //     'subjects' => 'required|string|max:255',
         //     'print_author' => 'required|string|max:255',
         //     'selectedAuthors' => 'nullable|string|max:255',
+        //     'pubSelectedID' => 'nullable|string|max:255',
         //     'publisherPrint' => 'nullable|string|max:255',
         //     'volume' => 'nullable|string|max:50',
         //     'copyright' => 'nullable|integer|between:1900,3000',
@@ -251,10 +253,93 @@ class AddResourceController extends Controller
 
         // return response()->json(['success' => true, 'data' => $validated]);
 
-        return response()->json([
-            'success' => true,
-            'data' => $request->all(),
-        ]);
+        //Normal Scenario
+
+        DB::beginTransaction();
+
+        try {
+            // Step 1: Insert into `lr` table
+            $lrId = Str::uuid()->toString();
+            $lrInserted = DB::table('lr')->insert([
+                'id' => $lrId,
+                'type_id' => $request->print_type,
+                'title_id' => $request->selectedID,
+            ]);
+
+            if (!$lrInserted) {
+                throw new \Exception('Failed to insert into lr table.');
+            }
+
+            // Step 2: Insert into `lr_print` table
+            $lrPrintId = Str::uuid()->toString();
+            $lrPrintInserted = DB::table('lr_print')->insert([
+                'id' => $lrPrintId,
+                'lr_id' => $lrId,
+                'publisher_id' => $request->pubSelectedID,
+                'volume' => $request->volume,
+                'copyright' => $request->copyright,
+                'pages' => $request->pages,
+            ]);
+
+            if (!$lrPrintInserted) {
+                throw new \Exception('Failed to insert into lr_print table.');
+            }
+
+            // Step 3: Insert into `acquisition` table
+            $acquisitionId = Str::uuid()->toString();
+            $acquisitionInserted = DB::table('acquisition')->insert([
+                'id' => $acquisitionId,
+                'lr_id' => $lrId,
+                'src_id' => $request->print_source,
+                'date_acquired' => $request->acqrd,
+                'qty' => $request->qty,
+                'status_id' => $request->print_status,
+                'remarks' => $request->remarks,
+            ]);
+
+            if (!$acquisitionInserted) {
+                throw new \Exception('Failed to insert into acquisition table.');
+            }
+
+            // Step 4: Insert into `lr_subject_grade_level` table
+            $subjectGradeLevelIds = explode(',', $request->subjects);
+            foreach ($subjectGradeLevelIds as $subjectGradeLevelId) {
+                $lrSubjectGradeLevelInserted = DB::table('lr_subject_grade_level')->insert([
+                    'id' => Str::uuid()->toString(),
+                    'lr_id' => $lrId,
+                    'subjectgradelevel_id' => $subjectGradeLevelId,
+                ]);
+
+                if (!$lrSubjectGradeLevelInserted) {
+                    throw new \Exception('Failed to insert into lr_subject_grade_level table.');
+                }
+            }
+
+            // Step 5: Insert into `masterlist` table (only if all above are successful)
+            for ($i = 0; $i < $request->quantity; $i++) {
+                $masterlistInserted = DB::table('masterlist')->insert([
+                    'id' => Str::uuid()->toString(),
+                    'acquisition_id' => $acquisitionId,
+                    'status_id' => $request->print_status,
+                ]);
+
+                if (!$masterlistInserted) {
+                    throw new \Exception('Failed to insert into masterlist table.');
+                }
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Data saved successfully'], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error saving data', 'error' => $e->getMessage()], 500);
+        }
+
+        // return response()->json([
+        //     'success' => true,
+        //     'data' => $request->all(),
+        // ]);
 
     }
 

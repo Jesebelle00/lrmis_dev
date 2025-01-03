@@ -41,7 +41,7 @@
 										<input type="text" class="form-control" id="search" name="search" placeholder="Start typing..."
 											required>
 									</div>
-									<input type="hidden" id="selected-id" name="selected-id">
+									<input type="hidden" id="selected-id" name="selectedID">
 									<div id="suggestions" class="col-12"></div>
 									<div class="col-md-12">
 										<label for="print_type" class="form-label">Type<span class="text-danger">*</span></label>
@@ -68,7 +68,7 @@
                                                 <ul id="subjectList"></ul>
                                             </div>
                                             <input type="hidden" id="subjectInput" name="subject" readonly required />
-                                            <div style="max-height: 250px; overflow-y: auto;">
+                                            <div style="max-height: 250px; overflow-y: auto; ">
                                                 <table class="table table-bordered compact-table">
                                                     <thead>
                                                         <tr>
@@ -91,14 +91,21 @@
                                                 text-align: left;
                                                 font-size: 16px;
                                             }
+
                                             .compact-table th {
                                                 white-space: nowrap;
+                                                background-color: #f8f9fa;
+                                                position: sticky;
+                                                top: 0;
+                                                z-index: 2;
                                             }
+
                                             .compact-table td input[type="checkbox"] {
                                                 width: 16px;
                                                 height: 16px;
                                                 margin: 0 auto;
                                             }
+
                                             .compact-table {
                                                 border-collapse: collapse;
                                             }
@@ -260,8 +267,8 @@
 										<textarea class="form-control" id="remarks" name="remarks"></textarea>
 									</div>
 
-									<div class="col-12">
-										<button id="add-button" type="submit" class="btn btn-primary">Add</button>
+									<div class="col-12 d-flex justify-content-center">
+										<button id="add-button" type="submit" class="shadow-dark loginbtn">Add</button>
 									</div>
 								</form>
 							</div>
@@ -326,88 +333,6 @@
 								console.error('Error fetching print types: ' + error);
 							}
 						});
-
-						// Subject Grade Level
-						// $.ajax({
-						// 	url: '/subjectgradelevel',
-						// 	type: 'GET',
-						// 	success: function(response) {
-						// 		if (response.subjects) {
-						// 			const subjectsContainer = $('#subjects');
-						// 			subjectsContainer.empty(); // Clear the container
-						// 			subjectsContainer.css({
-						// 				display: 'grid',
-						// 				gridTemplateColumns: 'repeat(3, 1fr)',
-						// 				gap: '10px',
-						// 				maxHeight: '250px',
-						// 				overflowY: 'auto',
-						// 				border: '1px solid #ccc',
-						// 				padding: '2px',
-						// 			});
-						// 			$.each(response.subjects, function(index, subject) {
-						// 				const checkbox = $('<input>', {
-						// 					type: 'checkbox',
-						// 					id: `subject-${subject.subjectgradelevel_id}`,
-						// 					name: 'subjects[]',
-						// 					value: subject.subjectgradelevel_id
-						// 				});
-						// 				const label = $('<label>', {
-						// 					for: `subject-${subject.subjectgradelevel_id}`,
-						// 					text: `${subject.subject_title} ${subject.gradelevel_shortcode}`
-						// 				});
-						// 				const div = $('<div>').append(checkbox, label);
-						// 				subjectsContainer.append(div);
-						// 			});
-						// 		}
-						// 	},
-						// 	error: function(xhr, status, error) {
-						// 		console.error("Error fetching data:", error);
-						// 	}
-						// });
-
-						// // Subject Selection with Removal
-						// var tempStorage = [];
-
-						// function updateSubjectInput() {
-						// 	$('#subjectInput').val(tempStorage.join(','));
-						// }
-
-						// $('#subjects').on('change', 'input[type="checkbox"]', function() {
-						// 	var selectedSubjectValue = $(this).val();
-						// 	var selectedSubjectText = $(this).siblings('label').text();
-
-						// 	if (this.checked) {
-						// 		if (!tempStorage.includes(selectedSubjectValue)) {
-						// 			tempStorage.push(selectedSubjectValue);
-						// 			$('#subjectList').append('<li>' + selectedSubjectText +
-						// 				' <button type="button" class="btn btn-sm btn-danger removeSubject" data-value="' +
-						// 				selectedSubjectValue + '">Remove</button></li>');
-						// 			updateSubjectInput();
-						// 		} else {
-						// 			alert('This subject is already added.');
-						// 		}
-						// 	} else {
-						// 		// Remove from tempStorage and UI when checkbox is unchecked
-						// 		tempStorage = tempStorage.filter(function(subjectValue) {
-						// 			return String(subjectValue) !== String(selectedSubjectValue);
-						// 		});
-						// 		$('#subjectList').find('button[data-value="' + selectedSubjectValue + '"]').parent()
-						// 			.remove();
-						// 		updateSubjectInput();
-						// 	}
-						// });
-
-						// $('#subjectList').on('click', '.removeSubject', function() {
-						// 	var subjectValueToRemove = String($(this).data('value'));
-						// 	tempStorage = tempStorage.filter(function(subjectValue) {
-						// 		return String(subjectValue) !== subjectValueToRemove;
-						// 	});
-						// 	$('#subjects').find('input[value="' + subjectValueToRemove + '"]').prop('checked',
-						// 		false); // Uncheck the corresponding checkbox
-						// 	$(this).parent().remove();
-						// 	updateSubjectInput();
-						// });
-
 
 						// Author Search and Selection
 						$('#print_author').on('input', function() {
@@ -672,21 +597,28 @@
                                         </div>
 
                                         <style>
-                                            /* Compact Table Styles for Non-Print */
+                                            /* Compact Table Styles */
                                             .compact-table-nonprint th,
                                             .compact-table-nonprint td {
-                                                padding: 6px !important;
+                                                padding: 4px !important;
                                                 text-align: left;
                                                 font-size: 16px;
                                             }
+
                                             .compact-table-nonprint th {
                                                 white-space: nowrap;
+                                                background-color: #f8f9fa;
+                                                position: sticky;
+                                                top: 0;
+                                                z-index: 2;
                                             }
+
                                             .compact-table-nonprint td input[type="checkbox"] {
                                                 width: 16px;
                                                 height: 16px;
                                                 margin: 0 auto;
                                             }
+
                                             .compact-table-nonprint {
                                                 border-collapse: collapse;
                                             }
@@ -842,8 +774,8 @@
 										<textarea class="form-control" id="remarks" name="remarks"></textarea>
 									</div>
 
-									<div class="col-12">
-										<button id="add-button" type="submit" class="btn btn-primary">Add</button>
+									<div class="col-12 d-flex justify-content-center">
+										<button id="add-button" type="submit" class="shadow-dark loginbtn">Add</button>
 									</div>
 								</form>
 							</div>

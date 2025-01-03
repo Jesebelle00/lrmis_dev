@@ -21,9 +21,9 @@ class ShareProfileService
         if (session()->has('profile_id') && session()->has('usertype_id')) {
             try {
                 $profile_id = session('profile_id');
-                $usertype_id = session('usertype_id');
+                $authority_level = session('authority_level');
 
-                $user_details = $this->loginController->fetchUserDetails($profile_id, $usertype_id);
+                $user_details = $this->loginController->fetchUserDetails($profile_id, $authority_level);
 
                 // Convert the collection to an array and extract 'contact_value'
                 $contactValues = collect($user_details)->map(function ($userDetail) {

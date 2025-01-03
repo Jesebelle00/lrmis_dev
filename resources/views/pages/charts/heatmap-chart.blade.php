@@ -4,13 +4,13 @@
 
     // Create arrays for grade levels and subject shortcodes
     var gradeLevels = [...new Set(heatmapDataRaw.map(item => item.grade_level))];
-    var subjectShortcodes = [...new Set(heatmapDataRaw.map(item => item.subject_shorcode))];
+    var subjectShortcodes = [...new Set(heatmapDataRaw.map(item => item.subject_shortcode))];
 
     // Map raw data to heatmap format: [gradeIndex, subjectIndex, qty]
     var heatMapData = heatmapDataRaw.map(item => {
         return [
             gradeLevels.indexOf(item.grade_level),  // Find grade level index
-            subjectShortcodes.indexOf(item.subject_shorcode),  // Find subject index
+            subjectShortcodes.indexOf(item.subject_shortcode),  // Find subject index
             item.qty  // Quantity
         ];
     });

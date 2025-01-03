@@ -111,6 +111,8 @@ class RegisterController extends Controller
             'contact_details.*' => 'nullable|string',
         ]);
 
+        $contactDetails = json_decode($request->input('contactDetails'), true);
+
         $authority = $request->input('authority');
         $station_id = null;
 
@@ -164,8 +166,10 @@ class RegisterController extends Controller
                     'profile_id' => $profileId,
                 ]);
 
-                if ($request->has('contact_details')) {
-                    foreach ($request->input('contact_details') as $contactTypeId => $contactValue) {
+                $contactDetails = json_decode($request->input('contactDetails'), true);
+
+                if (is_array($contactDetails)) {
+                    foreach ($contactDetails as $contactTypeId => $contactValue) {
                         $contactValue = trim($contactValue);
                         if (!empty($contactValue)) {
                             $existingContact = DB::table('contact_detail')

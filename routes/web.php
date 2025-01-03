@@ -77,7 +77,8 @@ Route::middleware([
 
     Route::get('/pages/user-profile/data', [UserProfileController::class, 'getData'])->name('user-profile.data');
     Route::get('/pages/station-profile/data', [StationProfileController::class, 'getData'])->name('station-profile.data');
-    Route::get('/view-resource/{id}', [ViewResourceController::class, 'show'])->name('view-resource');
+    Route::get('/view-resource-print/{id}', [ViewResourceController::class, 'show'])->name('view-resource-print');
+    Route::get('/view-resource-nonprint/{id}', [ViewResourceController::class, 'showNonPrint'])->name('view-resource-nonprint');
 
 });
 

@@ -5,7 +5,7 @@
     // Prepare the data array for the chart
     var exdefData = exdefData.map(function (item) {
         return [
-            item.subject_shorcode, // subject_title
+            item.subject_shortcode, // subject_title
             item.grade_level,      // grade_level
             item.qty,              // qty
             item.population,       // population

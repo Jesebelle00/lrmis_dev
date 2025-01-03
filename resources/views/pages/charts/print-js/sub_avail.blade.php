@@ -7,14 +7,14 @@
     var dataPrint = @json($subAvailData);
 
     var gradesPrint = [...new Set(dataPrint.map(item => item.grade_level))];
-    var subjectsPrint = [...new Set(dataPrint.map(item => item.subject_shorcode))];
+    var subjectsPrint = [...new Set(dataPrint.map(item => item.subject_shortcode))];
 
     // Prepare series data for print version
     var seriesPrint = subjectsPrint.map(subject => ({
         name: subject,
         type: 'bar',
         data: gradesPrint.map(grade => {
-            var item = dataPrint.find(d => d.grade_level === grade && d.subject_shorcode === subject);
+            var item = dataPrint.find(d => d.grade_level === grade && d.subject_shortcode === subject);
             return item ? item.qty : 0;
         })
     }));

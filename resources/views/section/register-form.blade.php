@@ -404,7 +404,7 @@
                             console.error('AJAX error:', error);
                             alert(
                                 'An error occurred during registration. Please try again later.'
-                                );
+                            );
                         }
                     }
                 });
