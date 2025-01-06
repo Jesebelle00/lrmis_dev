@@ -111,7 +111,7 @@ class LoginController extends Controller
         if (!session()->has('logged_in') || !session('logged_in')) {
             return redirect()->route('login')->withErrors(['message' => 'You must be logged in to access the dashboard.']);
         }
-    
+
         $profile_id = session('profile_id');
         $level = session('authority_level');
 
@@ -121,6 +121,7 @@ class LoginController extends Controller
         if (empty($user_details)) {
             return redirect()->route('login')->withErrors(['message' => 'User details could not be found.']);
         }
+
 
         // Map contact details
         $contactValues = collect($user_details)->map(function ($userDetail) {
@@ -147,13 +148,15 @@ class LoginController extends Controller
             $user_details[0][$stationName] ?? '',
             $contactValues
         );
-        
+
+
         // Fetch chart data
         $chartDataController = new ChartDataController();
         $printChartData = $chartDataController->getPrintChartData(); // This will return data from the ChartDataController
         $nonPrintChartData = $chartDataController->getNonPrintChartData(); // Data for non-print charts
         $totalLr = $chartDataController->getTotalLr();
         $totalLearners = $chartDataController->getTotalLearners();
+
 
         // Pass both profile data and chart data to the view
         return view('pages.dashboard', [
@@ -174,7 +177,7 @@ class LoginController extends Controller
             'totalPopulation' => $totalLearners['totalPopulation'],
         ]);
     }
-        
+
 
     public function fetchUserDetails($profile_id, $level)
     {
