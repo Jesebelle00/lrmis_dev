@@ -11,4 +11,6 @@ Route::get('lr', [QrController::class, 'index'])
 // routes/web.php
 Route::get('lr/{id}', [QrController::class, 'show'])->name('lr.show');
 
+Route::get('/status', [QrController::class, 'showQRCode']);
+
 

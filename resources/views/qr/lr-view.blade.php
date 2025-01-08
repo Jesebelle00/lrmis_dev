@@ -9,21 +9,17 @@
   <!-- DataTables CSS -->
   <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <style>
-    /* Position the Scan QR Code button at the top right */
-    .scan-qr-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-    }
 
-    /* Modal styling */
-    #reader {
-      width: 100%;
-      height: 400px;
-    }
-  </style>
+  <!-- Font Awesome CDN -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<!-- Custom CSS for styling -->
+<!-- Font Awesome CDN -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<!-- Custom CSS for styling -->
+<link rel="stylesheet" href="{{ asset('assets/css/qr/style.css') }}">
+
 </head>
 <body>
   <div class="container mt-5">
@@ -54,28 +50,39 @@
 
     <!-- Data Table -->
     <table id="example" class="table table-striped table-bordered">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Type</th>
-          <th>Title</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        @foreach($LrList as $lr)
-          <tr>
-            <td>{{ $lr->id }}</td>
-            <td>{{ $lr->typeName->type_name }}</td>
-            <td>{{ $lr->title->name }}</td>
-            <td>
-              <!-- Button with route to 'lr.show' passing $lr->id -->
-              <a href="{{ route('lr.show', ['id' => $lr->id]) }}" class="btn btn-primary">View</a>
-            </td>
-          </tr>
-        @endforeach
-      </tbody>
-    </table>
+            <thead>
+                <tr>
+                    <th>Actions</th>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Subject Area</th>
+                    <th>level</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($data as $lr)
+                    <tr>
+                        <td>
+                            <!-- View Button -->
+                            <a href="{{ route('lr.show', ['id' => $lr->lr_id]) }}" class="btn btn-primary" title="View Details">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+
+                            <!-- Print QR Code Button -->
+                            <a href="#" id={{$lr->lr_id}} class="btn btn-success printQR" title="Print QR Code">
+                                <i class="fas fa-print"></i> Print QR
+                            </a>
+                        </td>
+                        <td>{{ $lr->type_name }}</td>
+                        <td>{{ $lr->title }}</td>
+                        <td>{{ $lr->subject_title }}</td>
+                        <td>{{ $lr->grade_level }}</td>
+                    </tr>
+                @endforeach
+
+            </tbody>
+        </table>
+
   </div>
 
   <!-- Bootstrap JS -->
@@ -143,7 +150,89 @@
             });
     }
 
+    const printQR = document.querySelectorAll('.printQR');
+
+    // Attach click event listener to each printQR element
+    printQR.forEach(item => {
+    item.addEventListener('click', async (e) => {
+        // Prevent default behavior for anchor tag
+        e.preventDefault();
+
+        // Retrieve the id from the data-id attribute
+        const lrID = e.target.getAttribute('id');
+
+        if (lrID) {
+            try {
+                // Send GET request to the server with the id as a query parameter
+                const response = await fetch(`/status?id=${lrID}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Parse the JSON response
+                const data = await response.json();
+
+                // Check if QR code URL exists and use it
+                if (data.qr_code_url) {
+                    let qrCodeContent = `<img src="${data.qr_code_url}" alt="">`;
+                    // Insert the QR code image URL into your HTML (for example)
+
+                    // Create a new window or iframe to isolate the QR codes for printing
+                    const printWindow = window.open('', '', 'width=600,height=400');
+
+                    // Write the HTML content to the new window
+                    printWindow.document.open();
+                    printWindow.document.write('<html><head><title>Print QR Codes</title>');
+
+                    // Add CSS to style the print layout
+                    printWindow.document.write('<style>body{font-family: Arial, sans-serif; text-align: center; padding: 20px;}');
+                    printWindow.document.write('.qr-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-gap: 20px; justify-content: center; }');
+                    printWindow.document.write('.qr-code { width: 120px; height: 120px; background-color: #f0f0f0; border: 1px solid #ccc; padding: 10px; box-sizing: border-box; }');
+                    printWindow.document.write('.qr-code img { width: 100%; height: 100%; object-fit: contain; }');
+                    printWindow.document.write('</style>');
+                    printWindow.document.write('</head><body>');
+                    printWindow.document.write('<h2>QR Codes</h2>');
+
+                    // Create a grid with 24 QR codes (6x4 grid)
+                    printWindow.document.write('<div class="qr-grid">');
+                    for (let row = 0; row < 6; row++) {  // 6 rows
+                        for (let col = 0; col < 4; col++) {  // 4 columns
+                            printWindow.document.write('<div class="qr-code">' + qrCodeContent + '</div>');
+                        }
+                    }
+                    printWindow.document.write('</div>');
+                    printWindow.document.write('</body></html>');
+                    printWindow.document.close();
+
+                    // Wait for the content to load and then trigger the print dialog
+                    printWindow.onload = function () {
+                        printWindow.print();
+                        printWindow.close();
+                    };
+
+
+
+                } else {
+                    console.error('QR code URL not found in the response.');
+                }
+
+            } catch (error) {
+                console.error('Error fetching status:', error);
+            }
+        } else {
+            console.error('ID not found!');
+        }
+    });
+});
+
+
 
   </script>
+
+<!-- <script src="{{ asset('assets/js/qr/instascan.min.js') }}"></script> -->
+<!-- <script src="{{ asset('assets/js/qr/scanner.js') }}"></script> -->
+
+
 </body>
 </html>
