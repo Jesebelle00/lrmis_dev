@@ -12,9 +12,14 @@
 				<a class="nav-link" id="non-print-tab" data-bs-toggle="tab" data-bs-target="#non-print" role="tab"
 					aria-controls="non-print" aria-selected="false">Add Non-Print Material</a>
 			</li>
+			<li class="nav-item" role="presentation">
+				<a class="nav-link" id="excel-tab" data-bs-toggle="tab" data-bs-target="#excel" role="tab"
+					aria-controls="excel" aria-selected="true">Upload Excel Sample</a>
+			</li>
 		</ul>
 
 		<div class="tab-content" id="myTabContent">
+
 			<!-- PRINT TAB -->
 			<div class="tab-pane show active fade mt-4" id="print" role="tabpanel" aria-labelledby="print-tab">
 				<div class="card my-4 pt-2">
@@ -1084,6 +1089,50 @@
 
 			</div>
 			<!-- NON-PRINT TAB END -->
+			<!-- ```````````````````````````````````````````````````````````````````````````````````` -->
+			<!-- EXCEL FILE UPLOAD -->
+
+			<div class="tab-content" id="myTabContent">
+    		<div class="tab-pane show active fade mt-4" id="print" role="tabpanel" aria-labelledby="print-tab">
+        		<div class="card my-4 pt-2">
+            		<div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                		<div class="shadow-dark border-radius-lg pt-3 pb-2" style="background-color: #0071bd">
+                    		<h5 class="text-white text-capitalize ps-3">Upload Learning Resources</h5>
+                		</div>
+            		</div>
+            			<div class="card-body">
+
+						<!-- Download Excel Template -->
+                		<p style="text-align:right;" class="mb-3">
+							<!-- pathhhhh for excel -->
+							<a href="{{asset("assets/EXCEL/SAMPLE_TEMPLATE.xlsx")}}" download class="btn btn-secondary" style="background-color: #FFCD90; color: black;">
+                        		Download BLR Excel Template
+                    		</a>
+                		</p>	
+                			
+
+                	<!-- Upload Excel Form -->
+					<p style="text-align:left;" class="mb-0 text-dark ps-1 mb-0"> Upload your excel file here, then click Submit. </p>
+                	<form id="uploadForm" enctype="multipart/form-data">
+                    	<div class="mb-3">    
+                        		<!-- <label for="excelFile" class="form-label text-dark"> <span style="color:red">*</span> - required fields</label>  -->  
+                        		<input type="file" class="form-control" id="excelFile" name="excelFile" accept=".xls,.xlsx" required>
+                        		<div id="fileHelp" class="form-text">Only .xls or .xlsx files are allowed.</div>
+                    	</div>
+
+                    	<div class="d-flex justify-content-end">
+                        		<button type="submit" class="btn btn-primary">Submit</button>
+                    	</div>
+                	</form>
+            	</div>
+        	</div>
+    	</div>
+		</div>
+
+			<!-- EXCEL FILE UPLOAD END-->
+			<!-- ```````````````````````````````````````````````````````````````````````````````````` -->
+
+
 		</div>
 
 	</div>
