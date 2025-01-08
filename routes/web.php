@@ -95,3 +95,7 @@ Route::get('/search-authors', [AddResourceController::class, 'searchAuthor']);
 Route::get('/search-publishers', [AddResourceController::class, 'searchPublisher']);
 Route::get('/search-brands', [AddResourceController::class, 'searchBrand']);
 Route::view('/add-resources', 'pages.add-resources');
+
+
+/* QR-CODE  */
+require __DIR__.'/qrRoutes.php';
